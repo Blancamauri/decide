@@ -19,6 +19,12 @@ jobs:
         options: --health-cmd pg_isready --health-interval 10s --health-timeout 5s --health-retries 5
 
     steps:
+    - name: prerequisites
+      run: pip install psycopg2-binary
+    - name: prerequisites
+      run: sudo apt install libpq-dev python3-dev
+    - name: prerequisites
+      run: sudo apt install build-essential
     - uses: actions/checkout@v1
     - name: Set up Python 3.8
       uses: actions/setup-python@v1
