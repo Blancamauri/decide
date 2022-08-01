@@ -1,14 +1,27 @@
 name: Python application
 
-on: [push]
-
+on: 
+  push: 
+    branches: 
+      - master
+  workflow_call:
+    secrets:
+      CODACY_PROJECT_TOKEN:
+        required: true
+      HEROKU_API_KEY:
+        required: true
 jobs:
   build:
+    strategy:
+      matrix:
+        pyversion: ['3.5','3.8']
+        pgversion: ['10.8','12']
+
     runs-on: ubuntu-latest
 
     services:
       postgres:
-        image: postgres:10.8
+        image: postgres:${{matrix.pgversion}}
         env:
           POSTGRES_USER: decide
           POSTGRES_PASSWORD: decide
@@ -19,11 +32,11 @@ jobs:
         options: --health-cmd pg_isready --health-interval 10s --health-timeout 5s --health-retries 5
 
     steps:
-    - uses: actions/checkout@v1
+    - uses: actions/checkout@v2
     - name: Set up Python 3.8
-      uses: actions/setup-python@v1
+      uses: actions/setup-python@v2
       with:
-        python-version: 3.8
+        python-version: ${{matrix.pyversion}}
     - name: psycopg2 prerequisites
       run: sudo apt-get install libpq-dev
     - name: Install dependencies
@@ -33,19 +46,22 @@ jobs:
         pip install codacy-coverage
     - name: Run migrations
       run: cd decide;python manage.py migrate
-    - name: Run tests     
-      run: cd decide;coverage run --branch --source=. ./manage.py test census --keepdb; coverage xml;
+    - name: Run tests
+      #run: cd decide;coverage run --branch --source=. ./manage.py test census --keepdb --with-xunit; coverage xml; 
+      run: cd decide;coverage run --branch --source=. ./manage.py test census --keepdb; coverage xml; 
     - name: Codacy Coverage Reporter
-      uses: codacy/codacy-coverage-reporter-action@v1.1.0
+      uses: codacy/codacy-coverage-reporter-action@v1
       with:
           project-token: ${{ secrets.CODACY_PROJECT_TOKEN }}
-          coverage-reports: decide/coverage.xml
+          coverage-reports: decide/coverage.xml 
   deploy:
+    if: ${{github.ref == 'refs/heads/master' }}
+    needs: build 
     runs-on: ubuntu-latest
     steps:
-    - uses: actions/checkout@v1
+    - uses: actions/checkout@v2
     - uses: akhileshns/heroku-deploy@v3.12.12 # This is the action
       with:
           heroku_api_key: ${{secrets.HEROKU_API_KEY}}
-          heroku_app_name: "decide"
+          heroku_app_name: "decide" 
           heroku_email: "blamaurob@alum.us.es"
