@@ -21,7 +21,7 @@ jobs:
         options: --health-cmd pg_isready --health-interval 10s --health-timeout 5s --health-retries 5
     steps:
     - name: Set up Postgres ${{matrix.postgresversion}}
-      uses: actions/setup-postgres@v1
+      uses: azure/postgresql-action@v1
       with:
         postgres-version: ${{matrix.postgresversion}}
     - name: Set up Python ${{matrix.pyversion}}
