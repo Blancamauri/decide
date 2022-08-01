@@ -35,7 +35,7 @@ wheels/
 # Installer logs
 pip-log.txt
 pip-delete-this-directory.txt
-pip install psycopg2-binary
+pip install psycopg2
 
 # Unit test / coverage reports
 htmlcov/
