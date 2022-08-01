@@ -3,6 +3,8 @@ name: Python application
 on: [push]
 
 jobs:
+  deploy:
+    needs: build
   build:
     runs-on: ubuntu-latest
 
