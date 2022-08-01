@@ -23,7 +23,7 @@ jobs:
     - name: Set up Postgres ${{matrix.postgresversion}}
       uses: azure/postgresql-action@v1
       with:
-        postgres-version: ${{matrix.postgresversion}}
+        postgresql-version: ${{matrix.postgresversion}}
     - name: Set up Python ${{matrix.pyversion}}
       uses: actions/setup-python@v1
       with:
