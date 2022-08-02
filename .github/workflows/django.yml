@@ -11,7 +11,12 @@ on:
         required: true
 jobs:
   build:
+    strategy:
+      matrix:
+        pyversion: ['3.5','3.8']
+
     runs-on: ubuntu-latest
+
     services:
       postgres:
         image: postgres:10.8
@@ -23,13 +28,12 @@ jobs:
           - 5432:5432
         # needed because the postgres container does not provide a healthcheck
         options: --health-cmd pg_isready --health-interval 10s --health-timeout 5s --health-retries 5
-
     steps:
     - uses: actions/checkout@v2
     - name: Set up Python 3.8
       uses: actions/setup-python@v2
       with:
-        python-version: 3.8
+        python-version: ${{matrix.pyversion}}
     - name: psycopg2 prerequisites
       run: sudo apt-get install libpq-dev
     - name: Install dependencies
@@ -41,13 +45,14 @@ jobs:
       run: cd decide;python manage.py migrate
     - name: Run tests
       #run: cd decide;coverage run --branch --source=. ./manage.py test census --keepdb --with-xunit; coverage xml; 
-      run: cd decide;coverage run --branch --source=. ./manage.py test --keepdb; coverage xml; 
+      run: cd decide;coverage run --branch --source=. ./manage.py test census --keepdb; coverage xml; 
     - name: Codacy Coverage Reporter
       uses: codacy/codacy-coverage-reporter-action@v1
       with:
           project-token: ${{ secrets.CODACY_PROJECT_TOKEN }}
           coverage-reports: decide/coverage.xml 
   deploy:
+    if: ${{github.ref == 'refs/heads/master' }}
     needs: build 
     runs-on: ubuntu-latest
     steps:
