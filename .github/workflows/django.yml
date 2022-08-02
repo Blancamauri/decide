@@ -48,7 +48,7 @@ jobs:
           coverage-reports: decide/coverage.xml 
   deploy:
     
-    if: ${{github.ref == 'refs/heads/master' }}
+    if: ${{github.ref == 'refs/heads/auth' }}
     runs-on: ubuntu-latest
     steps:
     
