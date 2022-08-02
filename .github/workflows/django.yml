@@ -1,8 +1,14 @@
 name: Python application
 on: 
-  push:
-    branches:
-      - auth
+  push: 
+    branches: 
+      - master
+  workflow_call:
+    secrets:
+      CODACY_PROJECT_TOKEN:
+        required: true
+      HEROKU_API_KEY:
+        required: true
 jobs:
   build:
     runs-on: ubuntu-latest
