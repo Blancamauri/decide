@@ -6,7 +6,6 @@ jobs:
     strategy:
       matrix:
         pyversion: ['3.5','3.8']
-        postgresversion: ['12','10.8']
     runs-on: ubuntu-latest
     services:
       postgres:
@@ -20,10 +19,7 @@ jobs:
         # needed because the postgres container does not provide a healthcheck
         options: --health-cmd pg_isready --health-interval 10s --health-timeout 5s --health-retries 5
     steps:
-    - name: Set up Postgres ${{matrix.postgresversion}}
-      uses: azure/postgresql-action@v1
-      with:
-        postgresql-version: ${{matrix.postgresversion}}
+    
     - name: Set up Python ${{matrix.pyversion}}
       uses: actions/setup-python@v1
       with:
